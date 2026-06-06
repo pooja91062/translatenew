@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Receiver</title>
+
+<style>
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.chat{
+  width:420px;
+  background:rgba(255,255,255,0.08);
+  padding:30px;
+  border-radius:25px;
+  backdrop-filter:blur(10px);
+}
+
+select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:20px;
+  font-size:16px;
+}
+
+.msg{
+  background:#071133;
+  padding:20px;
+  border-radius:15px;
+  min-height:120px;
+  font-size:24px;
+  margin-top:15px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:20px;
+  border:none;
+  border-radius:12px;
+  background:#38bdf8;
+  color:black;
+  font-size:20px;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="chat">
+
+<select id="receiverLang">
+
+  <option value="en">English</option>
+
+  <option value="hi">Hindi</option>
+
+  <option value="gu">Gujarati</option>
+
+</select>
+
+<h1>📥 Receiver</h1>
+
+<div class="msg" id="msg">
+Waiting...
+</div>
+
+<button onclick="playAudio()">
+🔊 Play
+</button>
+
+</div>
+
+<script>
+
+let audioUrl = "";
+
+const msg =
+document.getElementById("msg");
+
+const receiverLang =
+document.getElementById("receiverLang");
+
+
+// LOAD TRANSLATION
+async function loadTranslation(){
+
+    try{
+
+        const lang = receiverLang.value;
+
+        const response =
+        await fetch("/target_lang?lang=" + lang);
+
+        const data = await response.json();
+
+        console.log(data);
+
+        if(data.length > 0){
+
+            msg.innerText =
+            data[0].translated_text;
+
+            audioUrl =
+            data[0].audio_file;
+
+            console.log(audioUrl);
+
+        }else{
+
+            msg.innerText = "Waiting...";
+
+            audioUrl = "";
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+
+// PLAY AUDIO
+function playAudio(){
+
+    if(audioUrl !== ""){
+
+        const audio =
+        new Audio(audioUrl);
+
+        audio.play();
+
+    }else{
+
+        alert("No audio found");
+
+    }
+
+}
+
+
+// LANGUAGE CHANGE
+receiverLang.addEventListener(
+    "change",
+    loadTranslation
+);
+
+
+// FIRST LOAD
+loadTranslation();
+
+
+</script>
+
+</body>
+</html>

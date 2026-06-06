@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sender</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card{
+  width:420px;
+  background:rgba(255,255,255,0.08);
+  padding:30px;
+  border-radius:20px;
+  backdrop-filter:blur(10px);
+  text-align:center;
+}
+
+select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+}
+
+.mic{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  background:red;
+  border:none;
+  font-size:40px;
+  color:white;
+  margin-top:20px;
+}
+
+.stop{
+  margin-top:10px;
+  padding:10px 20px;
+  background:orange;
+  border:none;
+  border-radius:10px;
+}
+
+.box{
+  margin-top:20px;
+  background:#0f172a;
+  padding:15px;
+  border-radius:10px;
+  min-height:80px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>🎤 Sender</h2>
+
+<select id="lang">
+  <option value="en-US">English</option>
+  <option value="hi-IN">Hindi</option>
+  <option value="gu-IN">Gujarati</option>
+</select>
+
+<br>
+
+<button class="mic" id="mic">🎤</button><br>
+<button class="stop" id="stop">Stop</button>
+
+<div class="box" id="text">Speak something...</div>
+
+</div>
+
+<script>
+
+const mic = document.getElementById("mic");
+const stop = document.getElementById("stop");
+const textBox = document.getElementById("text");
+
+const SpeechRecognition =
+window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+recognition.continuous = true;
+
+mic.onclick = () => {
+  recognition.lang = document.getElementById("lang").value;
+  recognition.start();
+};
+
+stop.onclick = () => recognition.stop();
+
+recognition.onresult = async (e) => {
+
+  let text = e.results[e.results.length - 1][0].transcript;
+  textBox.innerText = text;
+
+  let selected = document.getElementById("lang").value;
+
+  let target = "en";
+
+  if(selected === "hi-IN"){
+  target = "hi";
+  }
+  else if(selected === "gu-IN"){
+  target = "gu";
+  }
+
+  await fetch("/translate", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      text:text,
+      source_lang:"auto",
+      target_lang:target
+    })
+  });
+};
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Voice Translator</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card{
+  text-align:center;
+  background:rgba(255,255,255,0.08);
+  padding:40px;
+  border-radius:20px;
+  backdrop-filter:blur(10px);
+}
+
+h1{font-size:40px;}
+
+.btn{
+  display:block;
+  margin:15px auto;
+  padding:15px;
+  width:220px;
+  border-radius:12px;
+  text-decoration:none;
+  color:white;
+  font-size:18px;
+}
+
+.sender{background:#ef4444;}
+.receiver{background:#38bdf8;}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>🎤 Voice Translator</h1>
+
+  <a class="btn sender" href="/sender">Sender Mode</a>
+  <a class="btn receiver" href="/receiver">Receiver Mode</a>
+</div>
+
+</body>
+</html>
