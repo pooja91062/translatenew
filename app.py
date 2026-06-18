@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit
-from deep_translator import GoogleTranslator
-from gtts import gTTS        
+from deep_translator import GoogleTranslator     
 import uuid
 import os
 
@@ -81,18 +80,6 @@ def translate():
         ).translate(text)
 
         # audio
-        filename = f"{uuid.uuid4()}.mp3"
-
-        path = os.path.join("static", filename)
-
-        tts = gTTS(
-            text=translated,
-            lang=target_lang
-        )
-
-        tts.save(path)
-
-        audio_url = "/static/" + filename
 
         # save db
         new_record = Translation(
@@ -100,7 +87,7 @@ def translate():
             translated_text=translated,
             source_lang=source_lang,
             target_lang=target_lang,
-            audio_file=audio_url
+            audio_file=""
         )
 
         db.session.add(new_record)
@@ -110,14 +97,12 @@ def translate():
         "new_message",
         {
             "translated_text": translated,
-            "audio_url": audio_url
         }
     )
         
 
         return jsonify({
             "translated_text": translated,
-            "audio_url": audio_url
         })
 
     except Exception as e:
@@ -147,21 +132,9 @@ def target_lang():
             target=lang
         ).translate(latest.original_text)
 
-        filename = f"{uuid.uuid4()}.mp3"
-
-        path = os.path.join("static", filename)
-
-        tts = gTTS(
-            text=translated,
-            lang=lang
-        )
-
-        tts.save(path)
-
         return jsonify([
             {
                 "translated_text": translated,
-                "audio_file": "mobiledata.pythonanywhere.com/static/" + filename
             }
         ])
 
@@ -177,5 +150,9 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    app.run(debug=True)
-    socketio.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    
+    socketio.run(app,
+                 host="127.0.0.1",
+                 port=port,
+                 debug=True)

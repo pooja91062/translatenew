@@ -138,19 +138,13 @@ async function loadTranslation(){
 // PLAY AUDIO
 function playAudio(){
 
-    if(audioUrl !== ""){
+    const speech =
+    new SpeechSynthesisUtterance(msg.innerText);
 
-        const audio =
-        new Audio(audioUrl);
+    speech.lang = receiverLang.value;
 
-        audio.play();
-
-    }else{
-
-        alert("No audio found");
-
-    }
-
+    speechSynthesis.cancel();
+    speechSynthesis.speak(speech);
 }
 
 
@@ -160,6 +154,7 @@ receiverLang.addEventListener(
     loadTranslation
 );
 
+setInterval(loadTranslation, 2000);
 
 // FIRST LOAD
 loadTranslation();
