@@ -40,18 +40,6 @@ class Translation(db.Model):
 def home():
     return render_template("index.html")
 
-
-# SENDER PAGE
-@app.route("/sender")
-def sender():
-    return render_template("sender.html")
-
-
-# RECEIVER PAGE
-@app.route("/receiver")
-def receiver():
-    return render_template("receiver.html")
-
 # SOCKET CONNECT EVENT
 @socketio.on('connect')
 def handle_connect():
@@ -69,14 +57,23 @@ def translate():
 
         text = data.get("text")
 
-        source_lang = data.get("source_lang", "auto")
-
-        target_lang = data.get("target_lang", "en")
+        
 
         # translate
-        translated = GoogleTranslator(
-            source=source_lang,
-            target=target_lang
+
+        english = GoogleTranslator(
+            source="auto",
+            target="en"
+        ).translate(text)
+
+        hindi = GoogleTranslator(
+            source="auto",
+            target="hi"
+        ).translate(text)
+
+        gujarati = GoogleTranslator(
+            source="auto",
+            target="gu"
         ).translate(text)
 
         # audio
@@ -84,9 +81,9 @@ def translate():
         # save db
         new_record = Translation(
             original_text=text,
-            translated_text=translated,
-            source_lang=source_lang,
-            target_lang=target_lang,
+            translated_text=english,
+            source_lang="auto",
+            target_lang="en",
             audio_file=""
         )
 
@@ -96,13 +93,19 @@ def translate():
         socketio.emit(
         "new_message",
         {
-            "translated_text": translated,
+            "original": text,
+            "english": english,
+            "hindi": hindi,
+            "gujarati": gujarati
         }
     )
         
-
+        
         return jsonify({
-            "translated_text": translated,
+            "original": text,
+            "english": english,
+            "hindi": hindi,
+            "gujarati": gujarati
         })
 
     except Exception as e:
@@ -128,9 +131,9 @@ def target_lang():
             return jsonify([])
 
         translated = GoogleTranslator(
-            source='auto',
+            source="auto",
             target=lang
-        ).translate(latest.original_text)
+        ).translate(latest.original_text)   
 
         return jsonify([
             {

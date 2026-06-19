@@ -1,54 +1,387 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Voice Translator</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:linear-gradient(135deg,#0f172a,#1e293b);
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
-.card{
-  text-align:center;
-  background:rgba(255,255,255,0.08);
-  padding:40px;
-  border-radius:20px;
-  backdrop-filter:blur(10px);
-}
-
-h1{font-size:40px;}
-
-.btn{
-  display:block;
-  margin:15px auto;
-  padding:15px;
-  width:220px;
-  border-radius:12px;
-  text-decoration:none;
-  color:white;
-  font-size:18px;
-}
-
-.sender{background:#ef4444;}
-.receiver{background:#38bdf8;}
-</style>
+  <meta charset="UTF-8">
+  <title>Voice Translator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #020b30, #031858, #020b30);
+      color: white;
+    }
+    .header {
+      text-align: center;
+      padding: 25px;
+    }
+    .header h1 {
+      font-size: 60px;
+      font-weight: 700;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 20px;
+    }
+    .card {
+      width: 500px;
+      min-height: 700px;
+      background: rgba(0, 20, 80, 0.35);
+      border: 1px solid rgba(0, 180, 255, 0.2);
+      border-radius: 30px;
+      backdrop-filter: blur(15px);
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(0, 100, 255, 0.2);
+    }
+    .icon {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: auto;
+      font-size: 40px;
+    }
+    .sender-icon { background: #4338ca; }
+    .receiver-icon { background: #0891b2; }
+    .card h2 {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 45px;
+    }
+    .card p {
+      text-align: center;
+      color: #cbd5e1;
+      margin-bottom: 25px;
+    }
+    select {
+      width: 100%;
+      padding: 16px;
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #07143f;
+      color: white;
+      font-size: 18px;
+    }
+    .mic-section {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .mic {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #ff4d6d, #ff1744);
+      color: white;
+      font-size: 70px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ff1744, 0 0 50px rgba(255, 23, 68, 0.7);
+    }
+    .stop {
+      margin-top: 25px;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 40px;
+      background: #f59e0b;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .text-box {
+      margin-top: 35px;
+      background: #06112f;
+      border-radius: 18px;
+      padding: 25px;
+      min-height: 120px;
+      font-size: 30px;
+    }
+    .receiver-box {
+      margin-top: 35px;
+      background: #06112f;
+      border-radius: 20px;
+      padding: 35px;
+      min-height: 230px;
+      text-align: center;
+    }
+    .receiver-box h3 {
+      color: #22c55e;
+      margin-bottom: 25px;
+      font-size: 30px;
+    }
+    .translation {
+      font-size: 48px;
+      font-weight: bold;
+    }
+    .play {
+      width: 100%;
+      margin-top: 30px;
+      padding: 18px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      font-size: 25px;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 20px;
+      background: #06112f;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      color: #94a3b8;
+    }
+    @media (max-width: 1100px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+      .card {
+        width: 90%;
+      }
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="card">
-  <h1>🎤 Voice Translator</h1>
-
-  <a class="btn sender" href="/sender">Sender Mode</a>
-  <a class="btn receiver" href="/receiver">Receiver Mode</a>
-</div>
-
+  <div class="header">
+    <h1>🎤 Voice Translator</h1>
+  </div>
+ 
+  <div class="container">
+    <!-- Sender -->
+    <div class="card">
+      <div class="icon sender-icon">🎤</div>
+      <h2>Sender</h2>
+      <p>Speak in your language</p>
+      <select id="sourceLang">
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value="gu">Gujarati</option>
+      </select>
+      <div class="mic-section">
+        <button class="mic" id="micBtn">🎤</button>
+        <br>
+        <button class="stop" id="stopBtn">Stop</button>
+      </div>
+      <div class="text-box" id="senderText">Speak something...</div>
+    </div>
+ 
+    <!-- Receiver -->
+    <div class="card">
+      <div class="icon receiver-icon">🎧</div>
+      <h2>Receiver</h2>
+      <p>Listen in your language</p>
+      <select id="receiverLang">
+        <option value="hi">Hindi</option>
+        <option value="en">English</option>
+        <option value="gu">Gujarati</option>
+      </select>
+      <div class="receiver-box">
+        <h3>Translated Text</h3>
+        <div class="translation" id="receiverText">Waiting...</div>
+      </div>
+      <button class="play" onclick="playAudio()">🔊 Play Audio</button>
+      <div class="status" id="statusMsg">Waiting for new message...</div>
+    </div>
+  </div>
+ 
+  <script>
+    // ========== TRANSLATION CACHE ==========
+    const translations = { hi: null, gu: null, en: null };
+ 
+    // ========== SPEECH RECOGNITION ==========
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech Recognition not supported. Use Chrome or Edge.");
+    }
+ 
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+ 
+    const micBtn = document.getElementById("micBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const senderText = document.getElementById("senderText");
+    const receiverText = document.getElementById("receiverText");
+    const sourceLangSelect = document.getElementById("sourceLang");
+    const receiverLangSelect = document.getElementById("receiverLang");
+    const statusMsg = document.getElementById("statusMsg");
+ 
+    // Start listening
+    micBtn.addEventListener("click", () => {
+      const sourceLang = sourceLangSelect.value;
+      const langMap = {
+        en: "en-US",
+        hi: "hi-IN",
+        gu: "gu-IN"
+      };
+      recognition.lang = langMap[sourceLang] || "en-US";
+      recognition.start();
+      senderText.innerText = "Listening...";
+      statusMsg.innerText = "🎤 Speak now...";
+    });
+ 
+    // Stop listening
+    stopBtn.addEventListener("click", () => {
+      recognition.stop();
+      statusMsg.innerText = "Stopped listening.";
+    });
+ 
+    // ========== FREE TRANSLATION (MyMemory) ==========
+    async function translateText(text, sourceLang, targetLang) {
+      if (sourceLang === targetLang) return text;
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.responseStatus === 200) {
+          return data.responseData.translatedText;
+        } else {
+          console.warn("Translation error:", data);
+          return text; // fallback to original
+        }
+      } catch (err) {
+        console.error("Fetch failed:", err);
+        return text;
+      }
+    }
+ 
+    // ========== HANDLE SPEECH RESULT ==========
+    recognition.onresult = async (event) => {
+      let transcript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          transcript += event.results[i][0].transcript;
+        }
+      }
+      if (!transcript) return;
+ 
+      senderText.innerText = transcript;
+      const sourceLang = sourceLangSelect.value;
+ 
+      statusMsg.innerText = "Translating...";
+      try {
+        const [hi, gu, en] = await Promise.all([
+          translateText(transcript, sourceLang, "hi"),
+          translateText(transcript, sourceLang, "gu"),
+          translateText(transcript, sourceLang, "en")
+        ]);
+        translations.hi = hi;
+        translations.gu = gu;
+        translations.en = en;
+ 
+        updateReceiverDisplay();
+        statusMsg.innerText = "✅ Translation ready. Click 🔊 to hear.";
+      } catch (err) {
+        console.error("Translation failed:", err);
+        statusMsg.innerText = "❌ Translation error.";
+      }
+    };
+ 
+    recognition.onerror = (event) => {
+      console.error("Speech error:", event.error);
+      senderText.innerText = "Error: " + event.error;
+      statusMsg.innerText = "Mic error: " + event.error;
+    };
+ 
+    recognition.onend = () => {
+      if (senderText.innerText === "Listening...") {
+        senderText.innerText = "Speak something...";
+        statusMsg.innerText = "Waiting for new message...";
+      }
+    };
+ 
+    // ========== RECEIVER DISPLAY ==========
+    function updateReceiverDisplay() {
+      const lang = receiverLangSelect.value;
+      receiverText.innerText = translations[lang] || "Waiting...";
+    }
+ 
+    receiverLangSelect.addEventListener("change", updateReceiverDisplay);
+ 
+    // ========== TEXT‑TO‑SPEECH WITH GUARANTEED AUDIO ==========
+    function playAudio() {
+      const text = receiverText.innerText;
+      if (!text || text === "Waiting...") {
+        statusMsg.innerText = "⚠️ Nothing to play. Speak first!";
+        return;
+      }
+ 
+      // Speech synthesis support check
+      if (!window.speechSynthesis) {
+        alert("Speech Synthesis not supported in this browser.");
+        return;
+      }
+ 
+      statusMsg.innerText = "🔊 Playing audio...";
+ 
+      const utterance = new SpeechSynthesisUtterance(text);
+ 
+      // Map receiver language to BCP 47
+      const langMap = {
+        hi: "hi-IN",
+        en: "en-US",
+        gu: "gu-IN"
+      };
+      utterance.lang = langMap[receiverLangSelect.value] || "en-US";
+ 
+      // Ensure the best possible voice is selected, even if the exact language voice is missing
+      const setVoice = () => {
+        const voices = speechSynthesis.getVoices();
+        if (voices.length === 0) {
+          // No voices loaded yet – this almost never happens, but just in case
+          setTimeout(setVoice, 100);
+          return;
+        }
+ 
+        // Try to find a voice that matches the language
+        let selectedVoice = voices.find(voice => voice.lang.startsWith(utterance.lang.split('-')[0]));
+        if (!selectedVoice) {
+          // Fallback to any voice that contains the language
+          selectedVoice = voices.find(voice => voice.lang.includes(utterance.lang));
+        }
+        if (!selectedVoice) {
+          // Ultimate fallback: use the first available voice
+          selectedVoice = voices[0];
+        }
+ 
+        utterance.voice = selectedVoice;
+ 
+        // Cancel any previous speech and speak
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+ 
+        // Reset status when done (optional)
+        utterance.onend = () => {
+          statusMsg.innerText = "✅ Finished playing.";
+        };
+        utterance.onerror = (e) => {
+          console.error("Speech error:", e);
+          statusMsg.innerText = "❌ Audio playback error.";
+        };
+      };
+ 
+      // Voices might already be loaded
+      if (speechSynthesis.getVoices().length) {
+        setVoice();
+      } else {
+        // Wait for voices to load asynchronously
+        speechSynthesis.onvoiceschanged = () => {
+          setVoice();
+        };
+      }
+    }
+ 
+    // Also ensure voices are loaded for future use
+    speechSynthesis.getVoices();
+  </script>
 </body>
 </html>
