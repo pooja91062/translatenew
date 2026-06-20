@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from flask_sqlalchemy import SQLAlchemy
+from pymongo import MongoClient
 from flask_socketio import SocketIO, emit
 from deep_translator import GoogleTranslator     
 import uuid
@@ -9,30 +9,15 @@ app = Flask(__name__)
 socketio=SocketIO(app,cors_allowed_origins="*")
 
 # DATABASE
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///translator.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY']='secret!'
+client = MongoClient("mongodb://localhost:27017/")
+db = client["translator_db"]
 
-db = SQLAlchemy(app)
+translations = db["translations"]
 
 # STATIC FOLDER
 if not os.path.exists("static"):
     os.makedirs("static")
 
-# TABLE
-class Translation(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    original_text = db.Column(db.Text)
-
-    translated_text = db.Column(db.Text)
-
-    source_lang = db.Column(db.String(10))
-
-    target_lang = db.Column(db.String(10))
-
-    audio_file = db.Column(db.String(200))
 
 
 # HOME
@@ -126,33 +111,30 @@ def translate():
         # audio
 
         # save db
-        new_record = Translation(
-            original_text=text,
-            translated_text=english,
-            source_lang="auto",
-            target_lang="en",
-            audio_file=""
-        )
+        translations.insert_one({
+           "original_text": text,
+           "en": english,
+           "hi": hindi,
+           "gu": gujarati,
+           "source_lang": "auto"
+})
 
-        db.session.add(new_record)
-
-        db.session.commit()
         socketio.emit(
         "new_message",
         {
             "original": text,
-            "english": english,
-            "hindi": hindi,
-            "gujarati": gujarati
+            "en": english,
+            "hi": hindi,
+            "gu": gujarati
         }
     )
         
         
         return jsonify({
             "original": text,
-            "english": english,
-            "hindi": hindi,
-            "gujarati": gujarati
+            "en": english,
+            "hi": hindi,
+            "gu": gujarati
         })
 
     except Exception as e:
@@ -170,17 +152,14 @@ def target_lang():
 
         lang = request.args.get("lang", "en")
 
-        latest = Translation.query.order_by(
-            Translation.id.desc()
-        ).first()
+        latest = translations.find_one(
+            sort=[("_id", -1)]
+        )
 
         if not latest:
             return jsonify([])
 
-        translated = GoogleTranslator(
-            source="auto",
-            target=lang
-        ).translate(latest.original_text)   
+        translated = latest.get(lang, "")   
 
         return jsonify([
             {
@@ -196,9 +175,6 @@ def target_lang():
   
 
 if __name__ == "__main__":  
-
-    with app.app_context():
-        db.create_all()
 
     port = int(os.environ.get("PORT", 5000))
     
