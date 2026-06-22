@@ -30,53 +30,7 @@ def home():
 def handle_connect():
     print("Client Connected")
     emit('message', {'msg': 'Connected Successfully'})
-
-# =====================================
-# FRIEND REQUEST FEATURE
-# =====================================
-
-friend_requests = {}
-
-# SEND FRIEND REQUEST
-@app.route("/send_request", methods=["POST"])
-def send_request():
-
-    sender = request.json.get("sender")
-    receiver = request.json.get("receiver")
-
-    friend_requests[receiver] = sender
-
-    socketio.emit(
-        "friend_request",
-        {
-            "sender": sender,
-            "receiver": receiver
-        }
-    )
-
-    return jsonify({
-        "status": "sent"
-    })
-
-
-# ACCEPT FRIEND REQUEST
-@app.route("/accept_request", methods=["POST"])
-def accept_request():
-
-    sender = request.json.get("sender")
-
-    socketio.emit(
-        "request_accepted",
-        {
-            "sender": sender
-        }
-    )
-
-    return jsonify({
-        "status": "accepted"
-    })
-
-
+    
 
 
 # SEND MESSAGE
